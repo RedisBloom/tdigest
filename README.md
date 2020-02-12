@@ -1,9 +1,11 @@
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-# MergingDigest
+# T-Digest
 
-Wicked Fast, Accurate Quantiles Using ‘t-Digests’
+Adaptive histogram based on something like streaming k-means crossed with Q-digest.
+This implementation is a direct descendent of MergingDigest available at:
+[https://github.com/tdunning/t-digest/](https://github.com/tdunning/t-digest/)
 
 ## Description
 
@@ -22,17 +24,23 @@ accumulated distributions.
 See [the original paper by Ted Dunning & Otmar
 Ertl](https://arxiv.org/abs/1902.04023) for more details on t-Digests.
 
-## What’s Inside The Tin
+## What’s Inside
 
 The following functions are implemented:
 
   - `td_add`: Add a value to the t-Digest with the specified count
   - `td_create`: Allocate a new histogram
+  - `td_reset`: Empty out a histogram and re-initialise it
+  - `td_free`: Frees the memory associated with the t-Digest
+  - `td_compress`: Re-examines a the t-Digest to determine whether some centroids are redundant
   - `td_merge`: Merge one t-Digest into another
-  - `td_quantile_of`: Return the quantile of the value
-  - `td_total_count`: Total items contained in the t-Digest
-  - `td_value_at`: Return the value at the specified quantile
-  - `tquantile`: Calculate sample quantiles from a t-Digest
+  - `td_cdf`:  Returns the fraction of all points added which are &le; x.
+  - `td_quantile`: Returns an estimate of the cutoff such that a specified fraction of the data added to the t-Digest would be less than or equal to the cutoff.
+  - `td_size`: Return the number of points that have been added to the t-Digest
+  - `td_centroid_count`: Return the number of centroids being used by the t-Digest
+  - `td_min`: Get the minimum value from the histogram.  Will return __DBL_MAX__ if the histogram is empty
+  - `td_max`: Get the maximum value from the histogram.  Will return __DBL_MIN__ if the histogram is empty
+
 
 ## Microbenchmark
 

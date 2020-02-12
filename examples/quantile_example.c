@@ -24,15 +24,15 @@ int main()
     {
         td_add(mdigest, seeds[i], 1);
     }
-
+    td_compress(mdigest);
     for (int i = 0; i < 10; ++i)
     {
         const double v = seeds[i];
-        printf("value %f is at percentile %f\n", v, td_quantile_of(mdigest, v));
+        printf("value %f is at percentile %f\n", v, td_quantile(mdigest, v));
     }
     printf("\n");
     for (int i = 0; i <= 100; i += 10)
     {
-        printf("%d percentile has value %f\n", i, td_value_at(mdigest, i / 100.0));
+        printf("%d percentile has value %f\n", i, td_cdf(mdigest, i / 100.0));
     }
 }
