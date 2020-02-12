@@ -34,10 +34,11 @@ The following functions are implemented:
   - `td_value_at`: Return the value at the specified quantile
   - `tquantile`: Calculate sample quantiles from a t-Digest
 
-## Installation
+## Microbenchmark
 
-#### Proof it’s faster
+### Ingestion
 
+#### master
 ``` c
 tdigest/build$ ./tests/histogram_benchmark --benchmark_min_time=10
 2020-02-11 20:02:33
@@ -62,6 +63,34 @@ BM_td_add_lognormal_dist/200/10000000 1277987660 ns   1278668415 ns           11
 BM_td_add_lognormal_dist/300/10000000 1337314230 ns   1337816350 ns           10 Centroid_Count=164 items_per_second=747.487k/s
 BM_td_add_lognormal_dist/400/10000000 1381403323 ns   1381770352 ns           10 Centroid_Count=216 items_per_second=723.709k/s
 BM_td_add_lognormal_dist/500/10000000 1414399110 ns   1414644710 ns           10 Centroid_Count=258 items_per_second=706.891k/s
+```
+
+#### perf.improvements branch
+
+``` c
+tdigest/build$ ./tests/histogram_benchmark --benchmark_min_time=10
+2020-02-11 23:14:02
+Running ./tests/histogram_benchmark
+Run on (8 X 3900 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x4)
+  L1 Instruction 32 KiB (x4)
+  L2 Unified 256 KiB (x4)
+  L3 Unified 6144 KiB (x1)
+Load Average: 1.04, 0.89, 0.66
+------------------------------------------------------------------------------------------------
+Benchmark                                      Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------
+BM_td_add_uniform_dist/100/10000000    712450620 ns    712435331 ns           20 Centroid_Count=58 items_per_second=701.818k/s
+BM_td_add_uniform_dist/200/10000000    750092888 ns    750076049 ns           18 Centroid_Count=109 items_per_second=740.666k/s
+BM_td_add_uniform_dist/300/10000000    781008883 ns    780995728 ns           14 Centroid_Count=151 items_per_second=914.583k/s
+BM_td_add_uniform_dist/400/10000000    807423012 ns    807401866 ns           13 Centroid_Count=194 items_per_second=952.724k/s
+BM_td_add_uniform_dist/500/10000000    819856779 ns    819832154 ns           17 Centroid_Count=235 items_per_second=717.507k/s
+BM_td_add_lognormal_dist/100/10000000  699143606 ns    699132082 ns           20 Centroid_Count=54 items_per_second=715.172k/s
+BM_td_add_lognormal_dist/200/10000000  746849189 ns    746836572 ns           18 Centroid_Count=101 items_per_second=743.878k/s
+BM_td_add_lognormal_dist/300/10000000  783043547 ns    783026370 ns           14 Centroid_Count=155 items_per_second=912.212k/s
+BM_td_add_lognormal_dist/400/10000000  806705545 ns    806688685 ns           13 Centroid_Count=198 items_per_second=953.566k/s
+BM_td_add_lognormal_dist/500/10000000  815863658 ns    815799172 ns           17 Centroid_Count=237 items_per_second=721.054k/s
 ```
 
 ## Code of Conduct

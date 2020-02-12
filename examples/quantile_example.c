@@ -8,8 +8,10 @@ static inline double randMToN(double M, double N)
     return M + (rand() / (RAND_MAX / (N - M)));
 }
 
+
 int main()
 {
+
     td_histogram_t *mdigest = td_new(500);
     printf("compression is %f capacity is %d\n", mdigest->compression, mdigest->cap);
     double seeds[STREAM_SIZE];

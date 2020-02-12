@@ -25,11 +25,6 @@ static void generate_arguments_pairs(benchmark::internal::Benchmark *b)
     }
 }
 
-static inline double randMToN(double M, double N)
-{
-    return M + (rand() / (RAND_MAX / (N - M)));
-}
-
 static void BM_td_add_uniform_dist(benchmark::State &state)
 {
     const double compression = state.range(0);

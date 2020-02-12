@@ -21,10 +21,10 @@
 
 #define MM_PI 3.14159265358979323846
 
-typedef struct node {
-  double mean;
-  double count;
-} node_t;
+// typedef struct node {
+//   double mean;
+//   double count;
+// } node_t;
 
 struct td_histogram {
   // compression is a setting used to configure the size of centroids when merged.
@@ -40,7 +40,8 @@ struct td_histogram {
   double merged_count;
   double unmerged_count;
 
-  node_t nodes[];
+  double* nodes_m;
+  double* nodes_c;
 };
 
 typedef struct td_histogram td_histogram_t;
@@ -49,9 +50,36 @@ typedef struct td_histogram td_histogram_t;
 extern "C" {
 #endif
 
+void td_qsort(double* weights, double* counts, int first, int last);
+
 // td_new allocates a new histogram.
 // It is similar to init but assumes that it can use malloc.
 td_histogram_t *td_new(double compression);
+
+
+/**
+ * Allocate the memory and initialise the hdr_histogram.
+ *
+ * Due to the size of the histogram being the result of some reasonably
+ * involved math on the input parameters this function it is tricky to stack allocate.
+ * The histogram should be released with hdr_close
+ *
+ * @param lowest_trackable_value The smallest possible value to be put into the
+ * histogram.
+ * @param highest_trackable_value The largest possible value to be put into the
+ * histogram.
+ * @param significant_figures The level of precision for this histogram, i.e. the number
+ * of figures in a decimal number that will be maintained.  E.g. a value of 3 will mean
+ * the results from the histogram will be accurate up to the first three digits.  Must
+ * be a value between 1 and 5 (inclusive).
+ * @param result Output parameter to capture allocated histogram.
+ * @return 0 on success, EINVAL if lowest_trackable_value is < 1 or the
+ * significant_figure value is outside of the allowed range, ENOMEM if malloc
+ * failed.
+ */
+int td_init(
+    double compression,
+    td_histogram_t** result);
 
 // td_free frees the memory associated with h.
 void td_free(td_histogram_t *h);
@@ -68,10 +96,12 @@ void td_merge(td_histogram_t *into, td_histogram_t *from);
 
 // td_value_at queries h for the value at q.
 // If q is not in [0, 1], NAN will be returned.
+// Also know as cumulative distribution function
 double td_value_at(td_histogram_t *h, double q);
 
 // td_value_at queries h for the quantile of val.
 // The returned value will be in [0, 1].
+// It is also called the percent-point function or inverse cumulative distribution function.
 double td_quantile_of(td_histogram_t *h, double val);
 
 // td_total_count returns the total count contained in h.
