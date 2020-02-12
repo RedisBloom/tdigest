@@ -15,7 +15,8 @@ macro (add_compiler_flags)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_FLAGS}")
 endmacro ()
 
-project(tdigest VERSION 0.4.0 DESCRIPTION "Ted Dunning's T-Digest merging-digest version")
+project(tdigest VERSION 0.4.0 LANGUAGES C)
+
 set(CMAKE_BUILD_TYPE Release)
 
 option(BUILD_SHARED "Build shared library" ON)
