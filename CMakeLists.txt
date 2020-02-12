@@ -21,6 +21,8 @@ set(CMAKE_BUILD_TYPE Release)
 option(BUILD_SHARED "Build shared library" ON)
 option(BUILD_STATIC "Build static library" ON)
 
+add_compiler_flags ("-fPIC")
+
 option (ENABLE_FRAME_POINTER "Disable frame pointer omission" ON)
 
 if (ENABLE_FRAME_POINTER)
