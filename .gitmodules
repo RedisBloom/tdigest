@@ -1,3 +1,7 @@
 [submodule "tests/vendor/google/benchmark"]
 	path = tests/vendor/google/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "tests/vendor/google/googletest"]
+	path = tests/vendor/google/googletest
+	url = https://github.com/google/googletest.git
+	branch = release-1.10.0
