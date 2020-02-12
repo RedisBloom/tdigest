@@ -18,6 +18,7 @@ endmacro ()
 project(tdigest VERSION 0.4.0 DESCRIPTION "Ted Dunning's T-Digest merging-digest version")
 set(CMAKE_BUILD_TYPE Release)
 
+option(BUILD_SHARED "Build shared library" ON)
 option (ENABLE_FRAME_POINTER "Disable frame pointer omission" ON)
 
 if (ENABLE_FRAME_POINTER)
