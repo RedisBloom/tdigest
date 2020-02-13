@@ -14,7 +14,7 @@ if (BUILD_BENCHMARK)
     endif()
 endif()
 
-add_executable(td_test td_test.c minunit.c)
+add_executable(td_test td_test.c minunit.h)
 target_link_libraries(td_test tdigest m)
 enable_testing()
 add_test(td_test td_test)
