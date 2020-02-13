@@ -4,6 +4,31 @@
 #include <math.h>
 #include "tdigest.h"
 
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+/**
+* Compute the weighted average between <code>x1</code> with a weight of
+* <code>w1</code> and <code>x2</code> with a weight of <code>w2</code>.
+* This expects <code>x1</code> to be less than or equal to <code>x2</code>
+* and is guaranteed to return a number between <code>x1</code> and
+* <code>x2</code>.
+*/
+static double weightedAverageSorted(double x1, double w1, double x2, double w2)
+{
+     const double x = (x1 * w1 + x2 * w2) / (w1 + w2);
+     return MAX(x1, MIN(x, x2));
+}
+
+static double weightedAverage(double x1, double w1, double x2, double w2){
+     if (x1 <= x2){
+          return weightedAverageSorted(x1, w1, x2, w2);
+     }
+     else{
+          return weightedAverageSorted(x2, w2, x1, w1);
+     }
+}
+
 void td_qsort(double* weights, double* counts, int first, int last)
 {
     if (first >= last)
@@ -281,48 +306,78 @@ double td_quantile(td_histogram_t *h, double q) {
      if (q < 0.0 || q > 1.0 || h->merged_nodes == 0) {
           return NAN;
      }
-     // if left of the first node, use the first node
-     // if right of the last node, use the last node
-     const double goal = q * h->merged_weight;
-     double k = 0;
-     int i = 0;
-     double n_mean, n_count;
-     for (i = 0; i < h->merged_nodes; i++) {
-          n_mean = h->nodes_mean[i];
-          n_count = h->nodes_weight[i];
-          if (k + n_count > goal) {
-               break;
+     // with one data point, all quantiles lead to Rome
+     if (h->merged_nodes == 1) {
+          return h->nodes_mean[0];
+     }
+     
+     // if values were stored in a sorted array, index would be the offset we are interested in
+     const double index = q * h->merged_weight;
+
+     // beyond the boundaries, we return min or max
+     // usually, the first centroid will have unit weight so this will make it moot
+     if (index < 1) {
+          return h->min;
+     }
+
+     // we know that there are at least two centroids now
+     const int n = h->merged_nodes;
+
+     // if the left centroid has more than one sample, we still know
+     // that one sample occurred at min so we can do some interpolation
+     if (h->nodes_weight[0] > 1 && index < h->nodes_weight[0] / 2) {
+          // there is a single sample at min so we interpolate with less weight
+          return h->min + (index - 1) / (h->nodes_weight[0] / 2 - 1) * (h->nodes_mean[0] - h->min);
+     }
+
+     // usually the last centroid will have unit weight so this test will make it moot
+     if (index > h->merged_weight - 1) {
+          return h->max;
+     }
+     
+     // if the right-most centroid has more than one sample, we still know
+     // that one sample occurred at max so we can do some interpolation
+     if (h->nodes_weight[n-1] > 1 && h->merged_weight - index <= h->nodes_weight[n - 1] / 2) {
+          return h->max - (h->merged_weight - index - 1) / (h->nodes_weight[n - 1] / 2 - 1) * (h->max - h->nodes_mean[n - 1]);
+     }
+
+     // in between extremes we interpolate between centroids
+     double weightSoFar = h->nodes_weight[0] / 2;
+     for (int i = 0; i < n - 1; i++) {
+          double dw = (h->nodes_weight[i] + h->nodes_weight[i + 1]) / 2;
+          if (weightSoFar + dw > index) {
+               // centroids i and i+1 bracket our current point
+
+               // check for unit weight
+               double leftUnit = 0;
+               if (h->nodes_weight[i] == 1) {
+               if (index - weightSoFar < 0.5) {
+                    // within the singleton's sphere
+                    return h->nodes_mean[i];
+               } else {
+                    leftUnit = 0.5;
+               }
+               }
+               double rightUnit = 0;
+               if (h->nodes_weight[i + 1] == 1) {
+               if (weightSoFar + dw - index <= 0.5) {
+                    // no interpolation needed near singleton
+                    return h->nodes_mean[i + 1];
+               }
+               rightUnit = 0.5;
+               }
+               double z1 = index - weightSoFar - leftUnit;
+               double z2 = weightSoFar + dw - index - rightUnit;
+               return weightedAverage(h->nodes_mean[i], z2, h->nodes_mean[i + 1], z1);
           }
-          k += n_count;
+          weightSoFar += dw;
      }
-     const double delta_k = goal - k - (n_count/2);
-     if (is_very_small(delta_k)) {
-          return n_mean;
-     }
-     bool right = delta_k > 0;
-     if ((right && ((i) == h->merged_nodes)) ||
-         (!right && (i-1 == 0))) {
-          return n_mean;
-     }
-     double nm_r, nm_l,nc_r, nc_l; 
-     if (right) {
-          nm_l = n_mean;
-          nc_l = n_count;
-          nm_r = h->nodes_mean[i+1];
-          nc_r = h->nodes_weight[i+1];
-          k += (n_count/2);
-     } else {
-          nm_l = h->nodes_mean[i-1];
-          nc_l = h->nodes_weight[i-1];
-          nm_r = n_mean;
-          nc_r = n_count;
-          k -= (n_count/2);
-     }
-     const double x = goal - k;
-     // we have two points (0, nl->mean), (nr->count, nr->mean)
-     // and we want x
-     const double m = (nm_r - nm_l) / (nc_l/2 + nc_r/2);
-     return m * x + nm_l;
+     
+     // weightSoFar = totalWeight - weight[n-1]/2 (very nearly)
+     // so we interpolate out to max value ever seen
+     const double z1 = index - h->merged_weight - h->nodes_weight[n - 1] / 2.0;
+     const double z2 = h->nodes_weight[n - 1] / 2 - z1;
+     return weightedAverage(h->nodes_mean[n - 1], z1, h->max, z2);
 }
 
 

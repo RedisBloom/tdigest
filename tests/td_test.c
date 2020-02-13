@@ -49,6 +49,10 @@ MU_TEST(test_basic)
     mu_assert_double_eq(0, t->unmerged_weight);
     mu_assert_double_eq(0, t->merged_weight);
     td_add(t, 0.0, 1);
+    // with one data point, all quantiles lead to Rome
+    mu_assert_double_eq(0.0, td_quantile(t, .0));
+    mu_assert_double_eq(0.0, td_quantile(t, 0.5));
+    mu_assert_double_eq(0.0, td_quantile(t, 1.0));
     td_add(t, 10.0, 1);
     mu_assert_double_eq(0.0, td_min(t));
     mu_assert_double_eq(10.0, td_max(t));
@@ -56,10 +60,10 @@ MU_TEST(test_basic)
     mu_assert(t != NULL, "Failed to allocate hdr_histogram");
     mu_assert_double_eq(10.0, t->compression);
     mu_assert(td_compression(t) < t->cap, "False: buffer size < compression");
-
-    // mu_assert_double_eq(0.0, td_quantile(t, .1));
-    // mu_assert_double_eq(0.0, td_quantile(t, .5));
-    // mu_assert_double_eq(10.0, td_quantile(t, .99));
+    mu_assert_double_eq(0.0, td_quantile(t, .0));
+    mu_assert_double_eq(0.0, td_quantile(t, .1));
+    mu_assert_double_eq(10.0, td_quantile(t, .5));
+    mu_assert_double_eq(10.0, td_quantile(t, .99));
     td_free(t);
 }
 
