@@ -151,7 +151,7 @@ extern "C"
   double td_quantile(td_histogram_t *h, double q);
 
 
-/**
+  /**
  * Returns the current compression factor.
  *
  * @return The compression factor originally used to set up the TDigest.
