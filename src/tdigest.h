@@ -38,11 +38,14 @@ struct td_histogram
   // unmerged_nodes is the number of buffered nodes.
   int unmerged_nodes;
 
-  double merged_count;
-  double unmerged_count;
+  // we run the merge in reverse every other merge to avoid left-to-right bias in merging
+  long long total_compressions; 
 
-  double *nodes_m;
-  double *nodes_c;
+  double merged_weight;
+  double unmerged_weight;
+
+  double *nodes_mean;
+  double *nodes_weight;
 };
 
 typedef struct td_histogram td_histogram_t;
