@@ -159,6 +159,10 @@ void td_merge(td_histogram_t *into, td_histogram_t *from) {
      }
 }
 
+int td_centroid_count(td_histogram_t *h){
+     return next_node(h);
+}
+
 double td_size(td_histogram_t *h) {
      return h->merged_weight + h->unmerged_weight;
 }
