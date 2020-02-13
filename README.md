@@ -4,8 +4,14 @@
 # T-Digest
 
 Adaptive histogram based on something like streaming k-means crossed with Q-digest.
-This implementation is a direct descendent of MergingDigest available at:
+
+
+This implementation is a descendent of Ted MergingDigest, available at:
 [https://github.com/tdunning/t-digest/](https://github.com/tdunning/t-digest/)
+
+
+And contains the work of  Andrew Werner originally available at:
+[https://github.com/ajwerner/tdigestc](https://github.com/ajwerner/tdigestc)
 
 ## Description
 
@@ -40,12 +46,21 @@ The following functions are implemented:
   - `td_centroid_count`: Return the number of centroids being used by the t-Digest
   - `td_min`: Get the minimum value from the histogram.  Will return __DBL_MAX__ if the histogram is empty
   - `td_max`: Get the maximum value from the histogram.  Will return __DBL_MIN__ if the histogram is empty
+<<<<<<< HEAD
 
 
 ## Microbenchmark
 
 ### Ingestion
 
+=======
+
+
+## Microbenchmark
+
+### Ingestion
+
+>>>>>>> circleci-project-setup
 #### master
 ``` c
 tdigest/build$ ./tests/histogram_benchmark --benchmark_min_time=10
