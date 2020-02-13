@@ -46,21 +46,12 @@ The following functions are implemented:
   - `td_centroid_count`: Return the number of centroids being used by the t-Digest
   - `td_min`: Get the minimum value from the histogram.  Will return __DBL_MAX__ if the histogram is empty
   - `td_max`: Get the maximum value from the histogram.  Will return __DBL_MIN__ if the histogram is empty
-<<<<<<< HEAD
 
 
 ## Microbenchmark
 
 ### Ingestion
 
-=======
-
-
-## Microbenchmark
-
-### Ingestion
-
->>>>>>> circleci-project-setup
 #### master
 ``` c
 tdigest/build$ ./tests/histogram_benchmark --benchmark_min_time=10
