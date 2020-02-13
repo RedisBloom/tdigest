@@ -1,6 +1,6 @@
 #----------------------------------------------------------------------------------------------------
 # simple Makefile for T-Digest, relies on cmake to do the actual build.  
-# Use CMAKE_LIBRARY_OPTIONS or CMAKE_FULL_OPTIONS argument to this Makefile to pass options to cmake.
+# Use CMAKE_LIBRARY_OPTIONS,CMAKE_LIBRARY_SHARED_OPTIONS,CMAKE_LIBRARY_STATIC_OPTIONS or CMAKE_FULL_OPTIONS argument to this Makefile to pass options to cmake.
 #----------------------------------------------------------------------------------------------------
 
 ifndef CMAKE_LIBRARY_SHARED_OPTIONS

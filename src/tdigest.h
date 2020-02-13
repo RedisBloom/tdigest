@@ -142,19 +142,27 @@ extern "C"
   double td_cdf(td_histogram_t *h, double x);
 
   /**
- * Returns an estimate of the cutoff such that a specified fraction of the data
- * added to this TDigest would be less than or equal to the cutoff.
- *
- * @param q The desired fraction
- * @return The value x such that cdf(x) == q;
- */
+   * Returns an estimate of the cutoff such that a specified fraction of the data
+   * added to this TDigest would be less than or equal to the cutoff.
+   *
+   * @param q The desired fraction
+   * @return The value x such that cdf(x) == q;
+   */
   double td_quantile(td_histogram_t *h, double q);
 
-  /**
- * Returns the number of points that have been added to this TDigest.
+
+/**
+ * Returns the current compression factor.
  *
- * @return The sum of the weights on all centroids.
+ * @return The compression factor originally used to set up the TDigest.
  */
+  int td_compression(td_histogram_t *h);
+
+  /**
+   * Returns the number of points that have been added to this TDigest.
+   *
+   * @return The sum of the weights on all centroids.
+   */
   double td_size(td_histogram_t *h);
 
   /**

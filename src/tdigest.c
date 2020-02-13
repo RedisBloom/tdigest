@@ -137,8 +137,9 @@ double td_size(td_histogram_t *h) {
      return h->merged_count + h->unmerged_count;
 }
 
-double td_quantile(td_histogram_t *h, double val) {
+double td_cdf(td_histogram_t *h, double val) {
      td_compress(h);
+     // no data to examine
      if (h->merged_nodes == 0) {
           return NAN;
      }
@@ -178,9 +179,9 @@ double td_quantile(td_histogram_t *h, double val) {
      return (k + x) / h->merged_count;
 }
 
-
-double td_cdf(td_histogram_t *h, double q) {
+double td_quantile(td_histogram_t *h, double q) {
      td_compress(h);
+     // q should be in [0,1]
      if (q < 0.0 || q > 1.0 || h->merged_nodes == 0) {
           return NAN;
      }
@@ -292,4 +293,8 @@ double td_min(td_histogram_t *h) {
 
 double td_max(td_histogram_t *h) {
      return h->max;
+}
+
+int td_compression(td_histogram_t *h) {
+     return h->compression;
 }

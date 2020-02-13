@@ -17,6 +17,8 @@ endmacro ()
 
 project(tdigest VERSION 0.4.0 LANGUAGES C)
 
+ENABLE_TESTING()
+
 set(CMAKE_BUILD_TYPE Release)
 
 option(BUILD_SHARED "Build shared library" ON)
