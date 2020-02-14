@@ -66,7 +66,7 @@ make bench
 
 ### Ingestion
 
-#### master branch
+#### master branch (~121ns/iter for compression 100)
 ``` 
 tdigest$ make bench
 build/tests/histogram_benchmark --benchmark_min_time=10
@@ -94,8 +94,8 @@ BM_td_add_lognormal_dist/400/10000000 1523148779 ns   1507221068 ns            9
 BM_td_add_lognormal_dist/500/10000000 1551385694 ns   1551317295 ns            9 Centroid_Count=259 Total_Compressions=32.652k items_per_second=716.237k/s
 ```
 
-#### [perf.improvements](https://github.com/filipecosta90/tdigest/tree/perf.improvements) branch
-
+#### [perf.improvements](https://github.com/filipecosta90/tdigest/tree/perf.improvements) branch (~71ns/iter for compression 100)
+Making usage of naive quick sort with array of primary data-types instead of array of centroids ( struct ). Naive since it starts always at the beginning and the initial centroids are already sorted.
 ```
 2020-02-14 14:51:03
 Running build/tests/histogram_benchmark
@@ -121,10 +121,32 @@ BM_td_add_lognormal_dist/400/10000000  964961965 ns    964920578 ns           15
 BM_td_add_lognormal_dist/500/10000000 1078639324 ns   1078597549 ns           14 Centroid_Count=249 Total_Compressions=50.766k items_per_second=662.236k/s
 ```
 
-#### [perf.qsort.central](https://github.com/filipecosta90/tdigest/tree/perf.qsort.central) branch
-
+#### [perf.qsort.central](https://github.com/filipecosta90/tdigest/tree/perf.qsort.central) branch (~60ns/iter for compression 100)
+Making usage of quick sort but with central pivot
 ```
-
+build/tests/histogram_benchmark --benchmark_min_time=10
+2020-02-14 15:01:48
+Running build/tests/histogram_benchmark
+Run on (8 X 3900 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x4)
+  L1 Instruction 32 KiB (x4)
+  L2 Unified 256 KiB (x4)
+  L3 Unified 6144 KiB (x1)
+Load Average: 0.78, 0.80, 0.89
+------------------------------------------------------------------------------------------------
+Benchmark                                      Time             CPU   Iterations UserCounters...
+------------------------------------------------------------------------------------------------
+BM_td_add_uniform_dist/100/10000000    607977623 ns    607950826 ns           23 Centroid_Count=69 Total_Compressions=425.081k items_per_second=715.161k/s
+BM_td_add_uniform_dist/200/10000000    652122141 ns    652103931 ns           21 Centroid_Count=117 Total_Compressions=192.466k items_per_second=730.237k/s
+BM_td_add_uniform_dist/300/10000000    675920388 ns    675903292 ns           21 Centroid_Count=158 Total_Compressions=127.208k items_per_second=704.525k/s
+BM_td_add_uniform_dist/400/10000000    693811791 ns    693769234 ns           20 Centroid_Count=202 Total_Compressions=90.646k items_per_second=720.701k/s
+BM_td_add_uniform_dist/500/10000000    715648500 ns    715058842 ns           20 Centroid_Count=243 Total_Compressions=72.365k items_per_second=699.243k/s
+BM_td_add_lognormal_dist/100/10000000  616520092 ns    616500798 ns           22 Centroid_Count=70 Total_Compressions=407.848k items_per_second=737.299k/s
+BM_td_add_lognormal_dist/200/10000000  659716761 ns    659695213 ns           21 Centroid_Count=117 Total_Compressions=192.261k items_per_second=721.834k/s
+BM_td_add_lognormal_dist/300/10000000  686360957 ns    686338645 ns           20 Centroid_Count=158 Total_Compressions=121.153k items_per_second=728.503k/s
+BM_td_add_lognormal_dist/400/10000000  710243244 ns    710176968 ns           20 Centroid_Count=202 Total_Compressions=90.684k items_per_second=704.05k/s
+BM_td_add_lognormal_dist/500/10000000  727330010 ns    727310898 ns           19 Centroid_Count=247 Total_Compressions=68.802k items_per_second=723.646k/s
 ```
 ## Code of Conduct
 
