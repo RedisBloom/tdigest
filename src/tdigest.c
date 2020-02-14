@@ -308,7 +308,6 @@ double td_quantile(td_histogram_t *h, double q) {
      }
      // with one data point, all quantiles lead to Rome
      if (h->merged_nodes == 1) {
-          printf("HERE %f\n",h->nodes_mean[0]);
           return h->nodes_mean[0];
      }
      
@@ -405,7 +404,7 @@ void td_compress(td_histogram_t *h) {
           return;
      }
      int N = h->merged_nodes + h->unmerged_nodes;
-     td_qsort(h->nodes_mean,h->nodes_weight, 0, N );
+     td_qsort(h->nodes_mean,h->nodes_weight, 0, N-1 );
      const double total_weight = h->merged_weight + h->unmerged_weight;
      const double denom = 2 * MM_PI * total_weight * log(total_weight);
      const double normalizer = h->compression / denom;
@@ -464,4 +463,18 @@ const double* td_centroids_mean(td_histogram_t *h){
 
 const double* td_centroids_weight(td_histogram_t *h){
      return h->nodes_weight;
+}
+
+double td_centroids_weight_at(td_histogram_t *h, int pos){
+     if (pos < 0 || pos > h->merged_nodes) {
+          return NAN;
+     }
+     return h->nodes_weight[pos];
+}
+
+double td_centroids_mean_at(td_histogram_t *h, int pos){
+     if (pos < 0 || pos > h->merged_nodes) {
+          return NAN;
+     }
+     return h->nodes_mean[pos];
 }
