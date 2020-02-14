@@ -66,8 +66,8 @@ make bench
 
 ### Ingestion
 
-#### master
-``` c
+#### master branch
+``` 
 tdigest$ make bench
 build/tests/histogram_benchmark --benchmark_min_time=10
 2020-02-13 18:59:18
@@ -94,12 +94,10 @@ BM_td_add_lognormal_dist/400/10000000 1523148779 ns   1507221068 ns            9
 BM_td_add_lognormal_dist/500/10000000 1551385694 ns   1551317295 ns            9 Centroid_Count=259 Total_Compressions=32.652k items_per_second=716.237k/s
 ```
 
-#### perf.improvements branch
+#### [perf.improvements](https://github.com/filipecosta90/tdigest/tree/perf.improvements) branch
 
-``` c
-tdigest$ make bench
-build/tests/histogram_benchmark --benchmark_min_time=10
-2020-02-13 19:03:31
+```
+2020-02-14 14:51:03
 Running build/tests/histogram_benchmark
 Run on (8 X 3900 MHz CPU s)
 CPU Caches:
@@ -107,22 +105,27 @@ CPU Caches:
   L1 Instruction 32 KiB (x4)
   L2 Unified 256 KiB (x4)
   L3 Unified 6144 KiB (x1)
-Load Average: 1.04, 1.10, 0.94
+Load Average: 1.50, 1.02, 0.96
 ------------------------------------------------------------------------------------------------
 Benchmark                                      Time             CPU   Iterations UserCounters...
 ------------------------------------------------------------------------------------------------
-BM_td_add_uniform_dist/100/10000000    620549600 ns    620516429 ns           22 Centroid_Count=56 Total_Compressions=404.425k items_per_second=732.528k/s
-BM_td_add_uniform_dist/200/10000000    685883111 ns    685849746 ns           20 Centroid_Count=110 Total_Compressions=182.358k items_per_second=729.023k/s
-BM_td_add_uniform_dist/300/10000000    727127573 ns    727096338 ns           19 Centroid_Count=153 Total_Compressions=115.006k items_per_second=723.86k/s
-BM_td_add_uniform_dist/400/10000000    732475918 ns    732445725 ns           19 Centroid_Count=190 Total_Compressions=85.779k items_per_second=718.573k/s
-BM_td_add_uniform_dist/500/10000000    745449159 ns    745410047 ns           19 Centroid_Count=238 Total_Compressions=68.738k items_per_second=706.076k/s
-BM_td_add_lognormal_dist/100/10000000  640487037 ns    640461066 ns           22 Centroid_Count=56 Total_Compressions=404.56k items_per_second=709.716k/s
-BM_td_add_lognormal_dist/200/10000000  687814951 ns    687778693 ns           20 Centroid_Count=104 Total_Compressions=182.567k items_per_second=726.978k/s
-BM_td_add_lognormal_dist/300/10000000  716653546 ns    716618062 ns           19 Centroid_Count=146 Total_Compressions=114.663k items_per_second=734.444k/s
-BM_td_add_lognormal_dist/400/10000000  741198076 ns    741168930 ns           14 Centroid_Count=197 Total_Compressions=63.375k items_per_second=963.729k/s
-BM_td_add_lognormal_dist/500/10000000  744030362 ns    742928616 ns           18 Centroid_Count=238 Total_Compressions=65.103k items_per_second=747.791k/s
+BM_td_add_uniform_dist/100/10000000    718939047 ns    718903714 ns           20 Centroid_Count=69 Total_Compressions=370.58k items_per_second=695.503k/s
+BM_td_add_uniform_dist/200/10000000    804681013 ns    804650949 ns           17 Centroid_Count=114 Total_Compressions=155.468k items_per_second=731.044k/s
+BM_td_add_uniform_dist/300/10000000    891044330 ns    891005893 ns           16 Centroid_Count=163 Total_Compressions=97.161k items_per_second=701.454k/s
+BM_td_add_uniform_dist/400/10000000   1033516962 ns   1033465854 ns           14 Centroid_Count=203 Total_Compressions=63.638k items_per_second=691.156k/s
+BM_td_add_uniform_dist/500/10000000   1095685997 ns   1095635532 ns           13 Centroid_Count=251 Total_Compressions=47.155k items_per_second=702.086k/s
+BM_td_add_lognormal_dist/100/10000000  736637497 ns    735809155 ns           18 Centroid_Count=66 Total_Compressions=332.592k items_per_second=755.027k/s
+BM_td_add_lognormal_dist/200/10000000  807975314 ns    807936447 ns           17 Centroid_Count=114 Total_Compressions=155.149k items_per_second=728.071k/s
+BM_td_add_lognormal_dist/300/10000000  900674982 ns    900632289 ns           16 Centroid_Count=160 Total_Compressions=97.167k items_per_second=693.957k/s
+BM_td_add_lognormal_dist/400/10000000  964961965 ns    964920578 ns           15 Centroid_Count=207 Total_Compressions=68.071k items_per_second=690.903k/s
+BM_td_add_lognormal_dist/500/10000000 1078639324 ns   1078597549 ns           14 Centroid_Count=249 Total_Compressions=50.766k items_per_second=662.236k/s
 ```
 
+#### [perf.qsort.central](https://github.com/filipecosta90/tdigest/tree/perf.qsort.central) branch
+
+```
+
+```
 ## Code of Conduct
 
 Please note that this project is released with a Contributor Code of

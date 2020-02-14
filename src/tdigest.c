@@ -29,45 +29,54 @@ static double weightedAverage(double x1, double w1, double x2, double w2){
      }
 }
 
-void td_qsort(double* weights, double* counts, int first, int last)
-{
-    if (last - first <= 1 )
-        return;
+static void inline swap(double* arr, int i, int j) {
+	const double temp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = temp;
+}
 
-    int pivot = first;
-    int i = first;
-    int j = last;
-    double tempW, tempC;
+void td_qsort(double* means, double* weights, int start, int end){
+    if (start < end){
+         // two elements can be directly compared
+         if ((end - start) == 1) {
+              if (means[start] > means[end]) {
+                   //adjust means
+                   swap(means, start, end);
+                   //adjust weights
+                   swap(weights, start, end);
+              }
+              return;
+         }
 
-    while (i < j)
-    {
-        while (weights[i] <= weights[pivot] && i < last)
-            i++;
-        while (weights[j] > weights[pivot])
-            j--;
-        if (i < j)
-        {
-            //adjust weights
-            tempW = weights[i];
-            weights[i] = weights[j];
-            weights[j] = tempW;
-            //adjust counts
-            tempC = counts[i];
-            counts[i] = counts[j];
-            counts[j] = tempC;
-        }
+         int pivot = start;
+         int i = start;
+         int j = end;
+
+         while (i < j) {
+              while (means[i] <= means[pivot] && i < end) {
+                   i++;
+              }
+              while (means[j] > means[pivot]) {
+                   j--;
+              }
+              if (i < j) {
+                   //adjust means
+                   swap(means, i, j);
+                   //adjust weights
+                   swap(weights, i, j);
+              }
+         }
+
+         //adjust means
+         swap(means, pivot, j);
+         //adjust weights
+         swap(weights, pivot, j);
+
+         if (j > start) {
+              td_qsort(means, weights, start, j - 1);
+         }
+         td_qsort(means, weights, j + 1, end);
     }
-
-    //adjust weights
-    tempW = weights[pivot];
-    weights[pivot] = weights[j];
-    weights[j] = tempW;
-    //adjust counts
-    tempC = counts[pivot];
-    counts[pivot] = counts[j];
-    counts[j] = tempC;
-    td_qsort(weights, counts, first, j - 1);
-    td_qsort(weights, counts, j + 1, last);
 }
 
 static inline bool is_very_small(double val) {
