@@ -67,25 +67,115 @@ MU_TEST(test_basic)
     td_free(t);
 }
 
-MU_TEST(test_uniform_rand)
+MU_TEST(test_compress_small)
 {
-    srand(time(NULL));
-    clock_t start = clock();
-    td_histogram_t *t = td_new(1000);
-    int N = 1000000;
-    for (int i = 0; i < N; i++)
-    {
-        td_add(t, randfrom(0, 100), 1);
+    td_histogram_t *t = td_new(100);
+    mu_assert(t != NULL, "created_histogram");
+    td_add(t, 1.0, 1);
+    mu_assert_double_eq(1.0, td_min(t));
+    mu_assert_double_eq(1.0, td_max(t));
+    mu_assert_double_eq(1.0, td_size(t));
+    mu_assert_int_eq(1, td_centroid_count(t));
+    mu_assert_long_eq(0, t->total_compressions);
+    mu_assert_double_eq(1.0, td_centroids_mean(t)[0]);
+    mu_assert_double_eq(1.0, td_centroids_weight(t)[0]);
+    mu_assert_int_eq(1, t->unmerged_nodes);
+    mu_assert_int_eq(0, t->merged_nodes);
+    td_compress(t);
+    mu_assert_int_eq(0, t->unmerged_nodes);
+    mu_assert_int_eq(1, t->merged_nodes);
+    mu_assert_long_eq(1, t->total_compressions);
+    mu_assert_double_eq(1.0, td_centroids_mean(t)[0]);
+    mu_assert_double_eq(1.0, td_centroids_weight(t)[0]);
+    mu_assert_double_eq(1.0, td_quantile(t, 0.001));
+    mu_assert_double_eq(1.0, td_quantile(t, 0.01));
+    mu_assert_double_eq(1.0, td_quantile(t, 0.5));
+    mu_assert_double_eq(1.0, td_quantile(t, 0.99));
+    mu_assert_double_eq(1.0, td_quantile(t, 0.999));
+    td_free(t);
+}
+
+MU_TEST(test_compress_large)
+{
+    td_histogram_t *t = td_new(100);
+    mu_assert(t != NULL, "created_histogram");
+    for (int i = 1; i <= 1000; ++i) {
+        td_add(t, (double)i, 1);
     }
-    clock_t end = clock();
-    double total = ((double)(end) - (double)(start)) / (double)(CLOCKS_PER_SEC);
-    double per = total / (double)(N);
-    // printf("it took %f or %f per\n", total, per);
-    double f[13] = {0, .01, .1, .2, .3, .4, .5, .6, .7, .8, .9, .99, 1};
-    for (int i = 0; i < 13; i++)
-    {
-        // printf("%f: %f\n", f[i], td_cdf(t, f[i]));
-    }
+    
+    mu_assert_double_eq(1.0, td_min(t));
+    mu_assert_double_eq(1000.0, td_max(t));
+    mu_assert_double_eq(1000.0, td_size(t));
+    // TODO: add this test cases
+    // EXPECT_EQ(500500, digest.sum());
+    // EXPECT_EQ(500.5, digest.mean());
+    mu_assert_double_eq(1.5, td_quantile(t, 0.001));
+    mu_assert_double_eq(10.5, td_quantile(t, 0.01));
+    // TODO: swap this one by the bellow
+    // mu_assert_double_eq(500.25, td_quantile(t, 0.5));
+    mu_assert_double_eq_epsilon(500.25, td_quantile(t, 0.5), 0.5);
+    // TODO: swap this one by the bellow
+    // mu_assert_double_eq(990.25, td_quantile(t, 0.99));
+    mu_assert_double_eq_epsilon(990.25, td_quantile(t, 0.99), 0.5);
+    mu_assert_double_eq(999.5, td_quantile(t, 0.999));
+    td_free(t);
+}
+
+
+MU_TEST(test_negative_values)
+{
+    td_histogram_t *t = td_new(100);
+    mu_assert(t != NULL, "created_histogram");
+    for (int i = 1; i <= 100; ++i) {
+        td_add(t, (double)i, 1);
+        td_add(t, -(double)i, 1);
+    }   
+    mu_assert_double_eq(-100.0, td_min(t));
+    mu_assert_double_eq(100.0, td_max(t));
+    mu_assert_double_eq(200.0, td_size(t));
+    mu_assert_double_eq(-100, td_quantile(t, 0.0));
+    mu_assert_double_eq(-100, td_quantile(t, 0.001));
+    mu_assert_double_eq(-98.5, td_quantile(t, 0.01));
+    mu_assert_double_eq(98.5, td_quantile(t, 0.99));
+    mu_assert_double_eq(100, td_quantile(t, 0.999));
+    mu_assert_double_eq(100, td_quantile(t, 1.0));
+    td_free(t);
+}
+
+MU_TEST(test_negative_values_merge)
+{
+    td_histogram_t *d1 = td_new(200);
+    td_histogram_t *d2 = td_new(200);
+    mu_assert(d1 != NULL, "created_histogram");
+    mu_assert(d2 != NULL, "created_histogram");
+    for (int i = 1; i <= 100; ++i) {
+        td_add(d1, (double)i, 1);
+        td_add(d2, -(double)i, 1);
+    }   
+    td_merge(d1,d2);
+    mu_assert_double_eq(-100.0, td_min(d1));
+    mu_assert_double_eq(100.0, td_max(d1));
+    mu_assert_double_eq(200.0, td_size(d1));
+    mu_assert_double_eq(-100, td_quantile(d1, 0.0));
+    mu_assert_double_eq(-100, td_quantile(d1, 0.001));
+    mu_assert_double_eq(-98.5, td_quantile(d1, 0.01));
+    mu_assert_double_eq(98.5, td_quantile(d1, 0.99));
+    mu_assert_double_eq(100, td_quantile(d1, 0.999));
+    mu_assert_double_eq(100, td_quantile(d1, 1.0));
+    td_free(d1);
+    td_free(d2);
+}
+
+
+MU_TEST(test_large_outlier_test)
+{
+    td_histogram_t *t = td_new(100);
+    mu_assert(t != NULL, "created_histogram");
+    for (int i = 1; i <= 19; ++i) {
+        td_add(t, (double)i, 1);
+    } 
+    td_add(t, 1000000, 1);  
+    mu_assert(td_quantile(t, 0.5) < td_quantile(t, 0.9), "False: td_quantile(t, 0.5) < td_quantile(t, 0.9)");
     td_free(t);
 }
 
@@ -113,7 +203,7 @@ MU_TEST(test_two_interp)
 
 MU_TEST(test_cdf)
 {
-    td_histogram_t *t = td_new(10);
+    td_histogram_t *t = td_new(100);
     td_add(t, 1, 1);
     mu_assert_double_eq(0,td_cdf(t, 0));
     // exactly one centroid, should have max==min
@@ -169,8 +259,12 @@ MU_TEST(test_quantiles)
 MU_TEST_SUITE(test_suite)
 {
     MU_RUN_TEST(test_basic);
-    MU_RUN_TEST(test_uniform_rand);
+    MU_RUN_TEST(test_compress_small);
+    MU_RUN_TEST(test_compress_large);
     MU_RUN_TEST(test_nans);
+    MU_RUN_TEST(test_negative_values);
+    MU_RUN_TEST(test_negative_values_merge);
+    MU_RUN_TEST(test_large_outlier_test);
     MU_RUN_TEST(test_two_interp);
     MU_RUN_TEST(test_cdf);
     MU_RUN_TEST(test_td_size);

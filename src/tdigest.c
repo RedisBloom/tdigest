@@ -31,7 +31,7 @@ static double weightedAverage(double x1, double w1, double x2, double w2){
 
 void td_qsort(double* weights, double* counts, int first, int last)
 {
-    if (first >= last)
+    if (last - first <= 1 )
         return;
 
     int pivot = first;
@@ -308,6 +308,7 @@ double td_quantile(td_histogram_t *h, double q) {
      }
      // with one data point, all quantiles lead to Rome
      if (h->merged_nodes == 1) {
+          printf("HERE %f\n",h->nodes_mean[0]);
           return h->nodes_mean[0];
      }
      
@@ -410,6 +411,10 @@ void td_compress(td_histogram_t *h) {
      const double normalizer = h->compression / denom;
      int cur = 0;
      double count_so_far = 0;
+     // int lastUsedCell = 0;
+     //    h->nodes_mean[lastUsedCell] = incomingMean[incomingOrder[0]];
+     //    h->nodes_weight[lastUsedCell] = incomingWeight[incomingOrder[0]];
+
      for (int i = 1; i < N; i++) {
           const double proposed_count = h->nodes_weight[cur] + h->nodes_weight[i];
           const double z = proposed_count * normalizer;
@@ -451,4 +456,12 @@ double td_max(td_histogram_t *h) {
 
 int td_compression(td_histogram_t *h) {
      return h->compression;
+}
+
+const double* td_centroids_mean(td_histogram_t *h){
+     return h->nodes_mean;
+}
+
+const double* td_centroids_weight(td_histogram_t *h){
+     return h->nodes_weight;
 }

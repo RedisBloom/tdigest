@@ -191,6 +191,15 @@ extern "C"
  */
   double td_max(td_histogram_t *h);
 
+  /**
+ * Get maximum value from the histogram.
+ *
+ * @param h The histogram you want to free.
+ */
+  const double* td_centroids_mean(td_histogram_t *h);
+
+  const double* td_centroids_weight(td_histogram_t *h);
+
 #ifdef __cplusplus
 }
 #endif
